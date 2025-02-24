@@ -91,4 +91,4 @@ jobs:
             docker rmi ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker compose down || true
-            docker compose up --env-file .env -d
+            docker compose --env-file .env up -d
