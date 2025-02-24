@@ -62,13 +62,20 @@ jobs:
           default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
           default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
 
+      - name: Create .env file
+        run: |
+          echo "EMAIL=${EMAIL}" >> .env
+          echo "APP_NAME=${APP_NAME}" >> .env
+          echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
+          echo "CHAINLIT_AUTH_SECRET=${CHAINLIT_AUTH_SECRET}" >> .env
+
       - name: Transfer image and docker-compose to Scaleway instance
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          source: "${{ env.APP_NAME }}.tar,docker-compose.yaml"
+          source: "${{ env.APP_NAME }}.tar,docker-compose.yaml,.env"
           target: "/home/${{ secrets.SCW_SSH_USER }}/"
 
       - name: Deploy on Scaleway instance
@@ -80,8 +87,9 @@ jobs:
           envs: OPENAI_API_KEY,CHAINLIT_AUTH_SECRET,EMAIL,APP_NAME
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
+
             docker image rm ${{ env.APP_NAME }}:${{ github.sha }} || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker tag ${{ env.APP_NAME }}:${{ github.sha }} ${{ env.APP_NAME }}:latest
             docker compose down || true
-            docker compose up -d
+            docker compose up -d --env-file .env
