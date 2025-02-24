@@ -69,7 +69,7 @@ jobs:
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
           echo "CHAINLIT_AUTH_SECRET=${CHAINLIT_AUTH_SECRET}" >> .env
 
-      - name: Transfer image and docker-compose to Scaleway instance
+      - name: Transfer image, docker-compose et .env to Scaleway instance
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SCW_SSH_HOST }}
@@ -84,10 +84,9 @@ jobs:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          envs: OPENAI_API_KEY,CHAINLIT_AUTH_SECRET,EMAIL,APP_NAME
+          envs: APP_NAME
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
-
             docker image rm ${{ env.APP_NAME }}:${{ github.sha }} || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker tag ${{ env.APP_NAME }}:${{ github.sha }} ${{ env.APP_NAME }}:latest
