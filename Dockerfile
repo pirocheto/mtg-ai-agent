@@ -26,4 +26,4 @@ ADD ./app /app/app
 ADD ./data/MagicCompRules_2020250207.vectorstore /app/data/MagicCompRules_2020250207.vectorstore
 
 # Run the application
-CMD ["/app/.venv/bin/chainlit", "run", "/app/app/entrypoint.py", "-h", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["/app/.venv/bin/chainlit", "run", "/app/app/entrypoint.py", "-h", "--host", "0.0.0.0", "--port", "80"]

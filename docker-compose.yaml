@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  app:
+    image: "${APP_NAME}:latest"
+    container_name: "${APP_NAME}"
+    restart: always
+    environment:
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      CHAINLIT_AUTH_SECRET: "${CHAINLIT_AUTH_SECRET}"
+    networks:
+      - traefik_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${APP_NAME}.rule=Host(`chat.magicoracle.net`)"
+      - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${APP_NAME}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=80"
+
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    restart: always
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - traefik_net
+
+networks:
+  traefik_net:
+    driver: bridge
