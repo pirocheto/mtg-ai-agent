@@ -73,7 +73,7 @@ jobs:
             docker rmi ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker compose down || true
-            docker compose .env up -d \
+            docker compose up -d \
               -e APP_NAME=$APP_NAME \
               -e EMAIL=$EMAIL \
               -e OPENAI_API_KEY=$OPENAI_API_KEY \
