@@ -55,9 +55,9 @@ jobs:
         uses: scaleway/action-scw-secret@v0
         with:
           secret-names: |
+            email
             openai-api-key
             chainlit-auth-secret
-            email
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
           default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
@@ -65,8 +65,8 @@ jobs:
 
       - name: Create .env file
         run: |
+          echo "APP_NAME=${APP_NAME}" > .env
           echo "EMAIL=${EMAIL}" >> .env
-          echo "APP_NAME=${APP_NAME}" >> .env
           echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
           echo "CHAINLIT_AUTH_SECRET=${CHAINLIT_AUTH_SECRET}" >> .env
 
@@ -85,7 +85,6 @@ jobs:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          envs: APP_NAME
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
             docker rmi ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} || true
