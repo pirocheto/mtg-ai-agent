@@ -40,17 +40,6 @@ jobs:
         with:
           name: ${{ env.APP_NAME }}-image
 
-      - name: Use Scaleway CLI
-        uses: scaleway/action-scw@v0
-        with:
-          save-config: true
-          export-config: true
-          version: v2.24.0
-          access-key: ${{ secrets.SCW_ACCESS_KEY }}
-          secret-key: ${{ secrets.SCW_SECRET_KEY }}
-          default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
-          default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
-
       - name: Retrieve secrets from Scaleway
         uses: scaleway/action-scw-secret@v0
         with:
@@ -63,20 +52,13 @@ jobs:
           default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
           default-organization-id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
 
-      - name: Create .env file
-        run: |
-          echo "APP_NAME=${APP_NAME}" > .env
-          echo "EMAIL=${EMAIL}" >> .env
-          echo "OPENAI_API_KEY=${OPENAI_API_KEY}" >> .env
-          echo "CHAINLIT_AUTH_SECRET=${CHAINLIT_AUTH_SECRET}" >> .env
-
-      - name: Transfer image, docker-compose et .env to Scaleway instance
+      - name: Transfer image, docker-compose to Scaleway instance
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          source: "${{ env.APP_NAME }}.tar,docker-compose.yaml,.env"
+          source: "${{ env.APP_NAME }}.tar,docker-compose.yaml"
           target: "/home/${{ secrets.SCW_SSH_USER }}/"
 
       - name: Deploy on Scaleway instance
@@ -85,9 +67,14 @@ jobs:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
+          envs: APP_NAME,EMAIL,OPENAI_API_KEY,CHAINLIT_AUTH_SECRET
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
             docker rmi ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker compose down || true
-            docker compose --env-file .env up -d
+            docker compose .env up -d \
+              -e APP_NAME=$APP_NAME \
+              -e EMAIL=$EMAIL \
+              -e OPENAI_API_KEY=$OPENAI_API_KEY \
+              -e CHAINLIT_AUTH_SECRET=$CHAINLIT_AUTH_SECRET
