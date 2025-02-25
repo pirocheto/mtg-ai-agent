@@ -19,13 +19,13 @@ jobs:
         run: docker build -t ${{ env.APP_NAME }}:${{ github.sha }} .
 
       - name: Save Docker image as tar file
-        run: docker save ${{ env.APP_NAME }}:${{ github.sha }} -o ${{ env.APP_NAME }}.tar
+        run: docker save ${{ env.APP_NAME }}:${{ github.sha }} | gzip > ${{ env.APP_NAME }}.tar.gz
 
       - name: Upload artifact (Docker image)
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}-image
-          path: ${{ env.APP_NAME }}.tar
+          path: ${{ env.APP_NAME }}.tar.gz
 
   deploy:
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          source: "${{ env.APP_NAME }}.tar,docker-compose.yaml"
+          source: "${{ env.APP_NAME }}.tar.gz,docker-compose.yaml"
           target: "/home/${{ secrets.SCW_SSH_USER }}/"
 
       - name: Deploy on Scaleway instance
@@ -73,5 +73,5 @@ jobs:
             cd /home/${{ secrets.SCW_SSH_USER }}
             docker compose down || true
             docker rmi $(docker images -q ${{ env.APP_NAME }}) || true
-            docker load -i ${{ env.APP_NAME }}.tar
+            gunzip -c ${{ env.APP_NAME }}.tar.gz | docker load
             docker compose up -d
