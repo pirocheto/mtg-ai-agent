@@ -7,7 +7,6 @@ on:
 
 env:
   APP_NAME: mtg-ai-agent
-  IMAGE_TAG: latest
 
 jobs:
   build:
@@ -17,10 +16,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} .
+        run: docker build -t ${{ env.APP_NAME }}:${{ github.sha }} .
 
       - name: Save Docker image as tar file
-        run: docker save ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} -o ${{ env.APP_NAME }}.tar
+        run: docker save ${{ env.APP_NAME }}:${{ github.sha }} -o ${{ env.APP_NAME }}.tar
 
       - name: Upload artifact (Docker image)
         uses: actions/upload-artifact@v4
@@ -63,14 +62,16 @@ jobs:
 
       - name: Deploy on Scaleway instance
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          TAG_VERSION: ${{ github.sha }}
         with:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
-          envs: APP_NAME,EMAIL,OPENAI_API_KEY,CHAINLIT_AUTH_SECRET
+          envs: APP_NAME,TAG_VERSION,EMAIL,OPENAI_API_KEY,CHAINLIT_AUTH_SECRET
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
             docker compose down || true
-            docker rmi ${{ env.APP_NAME }}:${{ env.IMAGE_TAG }} || true
+            docker rmi $(docker images -q ${{ env.APP_NAME }}) || true
             docker load -i ${{ env.APP_NAME }}.tar
             docker compose up -d
