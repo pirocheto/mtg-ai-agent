@@ -1,14 +1,24 @@
-# Welcome to Chainlit! 🚀🤖
+# Magic Oracle
 
-Hi there, Developer! 👋 We're excited to have you on board. Chainlit is a powerful tool designed to help you prototype, debug and share applications built on top of LLMs.
+## Overview
 
-## Useful Links 🔗
+Magic Oracle is an AI-powered assistant designed to help users understand and navigate the rules and cards of the game Magic: The Gathering. It can provide detailed explanations of specific cards, including their abilities, interactions, and rulings, helping players better understand and utilize their cards during gameplay.
 
-- **Documentation:** Get started with our comprehensive [Chainlit Documentation](https://docs.chainlit.io) 📚
-- **Discord Community:** Join our friendly [Chainlit Discord](https://discord.gg/k73SQ3FyUh) to ask questions, share your projects, and connect with other developers! 💬
+## Features
 
-We can't wait to see what you create with Chainlit! Happy coding! 💻😊
+- **Rule Lookup**: Quickly find specific rules and their explanations.
+- **Card Interactions**: Understand how different cards interact with each other.
+- **Game Scenarios**: Get clarifications on complex game scenarios.
+- **Multilingual Support**: Available in multiple languages.
+- And more...
 
-## Welcome screen
+## Commands
 
-To modify the welcome screen, edit the `chainlit.md` file at the root of your project. If you do not want a welcome screen, just leave this file empty.
+| Command                    | Description          |
+| -------------------------- | -------------------- |
+| `/show <card-name>`        | Show image of card   |
+| `/rule <rule-description>` | Show a specific rule |
+
+## Github
+
+To see the complete source code, visit the [GitHub repository](https://github.com/chainlit/mtg-rules-assistant).
