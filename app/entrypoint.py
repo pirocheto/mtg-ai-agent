@@ -17,6 +17,7 @@ from app.agent.graph import graph
 async def start():
     commands = [
         {"id": "show", "icon": "image", "description": "Show card image"},
+        {"id": "rule", "icon": "text", "description": "Explain a rule"},
     ]
 
     await cl.context.emitter.set_commands(commands)
@@ -74,6 +75,9 @@ async def on_message(msg: cl.Message):
         msg.content = (
             f"Only show the image of the card {msg.content} without any explanation."
         )
+
+    if msg.command == "rule":
+        msg.content = f"Explain '{msg.content}' rule for a beginner. Cite sources."
 
     final_answer = cl.Message(content="")
     inputs = {"messages": [HumanMessage(msg.content)]}
