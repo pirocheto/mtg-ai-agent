@@ -25,5 +25,8 @@ ADD ./app /app/app
 # Copy the vectorstore containing MTG rules into the image
 ADD ./data/MagicCompRules_2020250207.vectorstore /app/data/MagicCompRules_2020250207.vectorstore
 
+# Change the working directory to the `app` directory
+WORKDIR /app/app
+
 # Run the application
-CMD ["/app/.venv/bin/chainlit", "run", "/app/app/entrypoint.py", "-h", "--host", "0.0.0.0", "--port", "80"]
+CMD ["/app/.venv/bin/chainlit", "run", "entrypoint.py", "-h", "--host", "0.0.0.0", "--port", "80"]
