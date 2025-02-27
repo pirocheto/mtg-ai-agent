@@ -86,3 +86,7 @@ jobs:
             docker load -i ${{ env.APP_NAME }}.tar
             docker compose up -d --no-deps
             docker image prune -a -f
+
+      - name: Add URL to workflow summary
+        run: |
+          echo "https://${{ env.APP_DOMAIN }}" >> $GITHUB_STEP_SUMMARY
