@@ -1,4 +1,9 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
 from langchain.schema.runnable.config import RunnableConfig
+
+load_dotenv(Path(__file__).parents[1] / "app/.env")
 
 from app.agent.graph import graph
 
@@ -13,7 +18,7 @@ def print_stream(stream):
 
 
 def test_graph():
-    question = "Quels sont les types de cartes dans Magic: The Gathering ?"
+    question = "Que dis la règle Flying ?"
     inputs = {"messages": [("user", question)]}
 
     config = RunnableConfig(

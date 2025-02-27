@@ -33,14 +33,16 @@ def trim_history(state: AgentState):
         # Most chat models expect that chat history ends with either:
         # (1) a HumanMessage or
         # (2) a ToolMessage
-        end_on=("human", "tool"),
+        # end_on=("human", "tool"),
+        end_on="ai",
         # Usually, we want to keep the SystemMessage
         # if it's present in the original history.
         # The SystemMessage has special instructions for the model.
         include_system=False,
     )
 
-    delete_messages = [
-        RemoveMessage(id=str(m.id)) for m in state["messages"] if m not in kept_messages
+    messages_to_delete = [
+        RemoveMessage(id=str(m.id)) for m in current_messages if m not in kept_messages
     ]
-    return {"messages": delete_messages}
+
+    return {"messages": messages_to_delete}

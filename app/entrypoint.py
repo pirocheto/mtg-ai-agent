@@ -14,31 +14,20 @@ sys.path.append(Path(__file__).parents[1].as_posix())
 
 from app.agent.graph import graph
 
-command_config = [
-    {
-        "id": "show",
-        "icon": "image",
-        "description": "Show card image",
-        "prompt": "Only show the image of the card {} without any explanation.",
-    },
-    {
-        "id": "rule",
-        "icon": "text",
-        "description": "Explain rule",
-        "prompt": "Explain '{}' rule for a beginner. Cite sources.",
-    },
-]
-
 
 @cl.on_chat_start
 async def start():
     commands = [
         {
-            "id": command["id"],
-            "icon": command["icon"],
-            "description": command["description"],
-        }
-        for command in command_config
+            "id": "show",
+            "icon": "image",
+            "description": "Show card image",
+        },
+        {
+            "id": "rule",
+            "icon": "text",
+            "description": "Explain rule",
+        },
     ]
     await cl.context.emitter.set_commands(commands)
 
@@ -87,16 +76,6 @@ if os.getenv("OAUTH_GITHUB_CLIENT_ID"):
 
 @cl.on_message
 async def on_message(msg: cl.Message):
-    # Modify the message content based on the command
-    msg.content = next(
-        (
-            command["prompt"].format(msg.content)
-            for command in command_config
-            if command["id"] == msg.command
-        ),
-        msg.content,
-    )
-
     final_answer = cl.Message(content="")
     inputs = {"messages": [HumanMessage(msg.content)]}
 
@@ -116,7 +95,7 @@ async def on_message(msg: cl.Message):
         if (
             chunk_msg.content
             and type(chunk_msg) is not HumanMessage
-            and metadata["langgraph_node"] in ["agent", "generate"]
+            and metadata["langgraph_node"] in ["agent"]
         ):
             chunk_msg.content = cast(str, chunk_msg.content)
             await final_answer.stream_token(chunk_msg.content)
