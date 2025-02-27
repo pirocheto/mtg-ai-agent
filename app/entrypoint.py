@@ -69,7 +69,6 @@ async def set_starters():
 def oauth_callback(
     provider_id: str, token: str, raw_user_data: dict[str, str], default_user: cl.User
 ) -> Optional[cl.User]:
-    print("provider_id", provider_id)
     return default_user
 
 

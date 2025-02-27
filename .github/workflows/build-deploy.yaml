@@ -8,7 +8,7 @@ on:
 env:
   APP_NAME: mtg-ai-agent
   APP_VERSION: ${{ github.sha }}
-  CHAINLIT_URL: chat.magicoracle.net
+  APP_DOMAIN: chat.magicoracle.net
 
 jobs:
   build:
@@ -74,6 +74,7 @@ jobs:
           envs: >
             APP_NAME,
             APP_VERSION,
+            APP_DOMAIN,
             EMAIL,
             OPENAI_API_KEY,
             CHAINLIT_URL,
