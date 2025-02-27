@@ -7,6 +7,8 @@ on:
 
 env:
   APP_NAME: mtg-ai-agent
+  APP_VERSION: ${{ github.sha }}
+  CHAINLIT_URL: chat.magicoracle.net
 
 jobs:
   build:
@@ -16,10 +18,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t ${{ env.APP_NAME }}:${{ github.sha }} .
+        run: docker build -t ${{ env.APP_NAME }}:${{ env.APP_VERSION }} .
 
       - name: Save Docker image as tar file
-        run: docker save ${{ env.APP_NAME }}:${{ github.sha }} -o ${{ env.APP_NAME }}.tar
+        run: docker save ${{ env.APP_NAME }}:${{ env.APP_VERSION }} -o ${{ env.APP_NAME }}.tar
 
       - name: Upload artifact (Docker image)
         uses: actions/upload-artifact@v4
@@ -64,20 +66,19 @@ jobs:
 
       - name: Deploy on Scaleway instance
         uses: appleboy/ssh-action@v0.1.10
-        env:
-          TAG_VERSION: ${{ github.sha }}
         with:
           host: ${{ secrets.SCW_SSH_HOST }}
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
           script_stop: true
-          envs: |
-            APP_NAME
-            TAG_VERSION
-            EMAIL
-            OPENAI_API_KEY
-            CHAINLIT_AUTH_SECRET
-            OAUTH_GITHUB_CLIENT_ID
+          envs: >
+            APP_NAME,
+            APP_VERSION,
+            EMAIL,
+            OPENAI_API_KEY,
+            CHAINLIT_URL,
+            CHAINLIT_AUTH_SECRET,
+            OAUTH_GITHUB_CLIENT_ID,
             OAUTH_GITHUB_CLIENT_SECRET
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}

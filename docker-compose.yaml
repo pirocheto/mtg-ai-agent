@@ -5,6 +5,7 @@ services:
     restart: always
     environment:
       OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      CHAINLIT_URL: "${CHAINLIT_URL}"
       CHAINLIT_AUTH_SECRET: "${CHAINLIT_AUTH_SECRET}"
       OAUTH_GITHUB_CLIENT_ID: "${OAUTH_GITHUB_CLIENT_ID}"
       OAUTH_GITHUB_CLIENT_SECRET: "${OAUTH_GITHUB_CLIENT_SECRET}"
@@ -12,7 +13,7 @@ services:
       - traefik_net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${APP_NAME:-app}.rule=Host(`chat.magicoracle.net`)"
+      - "traefik.http.routers.${APP_NAME:-app}.rule=Host(`${CHAINLIT_URL}`)"
       - "traefik.http.routers.${APP_NAME:-app}.entrypoints=websecure"
       - "traefik.http.routers.${APP_NAME:-app}.tls.certresolver=letsencrypt"
       - "traefik.http.services.${APP_NAME:-app}.loadbalancer.server.port=80"
