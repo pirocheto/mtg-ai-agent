@@ -1,9 +1,7 @@
-from langchain.chat_models import init_chat_model
 from langchain.prompts import PromptTemplate
 
+from app.agent.config import model
 from app.agent.state import AgentState
-
-model = init_chat_model("openai:gpt-4o")
 
 prompt = """
 Look at the input and try to reason about the underlying semantic intent / meaning.

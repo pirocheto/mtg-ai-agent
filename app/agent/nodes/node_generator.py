@@ -1,10 +1,7 @@
-from langchain.chat_models import init_chat_model
 from langchain_core.messages import SystemMessage
 
+from app.agent.config import model
 from app.agent.state import AgentState
-
-model = init_chat_model("openai:gpt-4o")
-
 
 system_prompt = """
 You are an assistant that helps users with questions about Magic: The Gathering rules.

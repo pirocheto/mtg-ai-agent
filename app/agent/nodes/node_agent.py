@@ -1,11 +1,9 @@
-from langchain.chat_models import init_chat_model
 from langchain_core.messages import SystemMessage
 
+from app.agent.config import model
 from app.agent.state import AgentState
 from app.agent.tools.tool_mtg_card import mtg_card_fetcher
 from app.agent.tools.tool_mtg_rules import mtg_rules_retriever
-
-model = init_chat_model("openai:gpt-4o")
 
 tools = [mtg_rules_retriever, mtg_card_fetcher]
 model_with_tools = model.bind_tools(tools)

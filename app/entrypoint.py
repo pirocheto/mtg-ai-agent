@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 from typing import Optional, cast
@@ -13,14 +14,32 @@ sys.path.append(Path(__file__).parents[1].as_posix())
 
 from app.agent.graph import graph
 
+command_config = [
+    {
+        "id": "show",
+        "icon": "image",
+        "description": "Show card image",
+        "prompt": "Only show the image of the card {} without any explanation.",
+    },
+    {
+        "id": "rule",
+        "icon": "text",
+        "description": "Explain rule",
+        "prompt": "Explain '{}' rule for a beginner. Cite sources.",
+    },
+]
+
 
 @cl.on_chat_start
 async def start():
     commands = [
-        {"id": "show", "icon": "image", "description": "Show card image"},
-        {"id": "rule", "icon": "text", "description": "Explain a rule"},
+        {
+            "id": command["id"],
+            "icon": command["icon"],
+            "description": command["description"],
+        }
+        for command in command_config
     ]
-
     await cl.context.emitter.set_commands(commands)
 
 
@@ -53,42 +72,38 @@ async def set_starters():
     ]
 
 
-# @cl.password_auth_callback
-# def auth_callback(username: str, password: str):
-#     # Fetch the user matching username from your database
-#     # and compare the hashed password with the value stored in the database
-#     if (username, password) == ("admin", "admin"):
-#         return cl.User(
-#             identifier="admin", metadata={"role": "admin", "provider": "credentials"}
-#         )
-#     else:
-#         return None
+# Condition to disable in development mode
+if os.getenv("OAUTH_GITHUB_CLIENT_ID"):
 
-
-@cl.oauth_callback
-def oauth_callback(
-    provider_id: str, token: str, raw_user_data: dict[str, str], default_user: cl.User
-) -> Optional[cl.User]:
-    return default_user
+    @cl.oauth_callback
+    def oauth_callback(
+        provider_id: str,
+        token: str,
+        raw_user_data: dict[str, str],
+        default_user: cl.User,
+    ) -> Optional[cl.User]:
+        return default_user
 
 
 @cl.on_message
 async def on_message(msg: cl.Message):
+    # Modify the message content based on the command
+    msg.content = next(
+        (
+            command["prompt"].format(msg.content)
+            for command in command_config
+            if command["id"] == msg.command
+        ),
+        msg.content,
+    )
+
+    final_answer = cl.Message(content="")
+    inputs = {"messages": [HumanMessage(msg.content)]}
+
     config = RunnableConfig(
         # callbacks=[cl.LangchainCallbackHandler()],
         configurable={"thread_id": cl.context.session.id},
     )
-
-    if msg.command == "show":
-        msg.content = (
-            f"Only show the image of the card {msg.content} without any explanation."
-        )
-
-    if msg.command == "rule":
-        msg.content = f"Explain '{msg.content}' rule for a beginner. Cite sources."
-
-    final_answer = cl.Message(content="")
-    inputs = {"messages": [HumanMessage(msg.content)]}
 
     for chunk_msg, metadata in graph.stream(
         inputs,

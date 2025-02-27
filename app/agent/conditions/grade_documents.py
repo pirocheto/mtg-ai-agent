@@ -1,12 +1,10 @@
 from typing import Literal, cast
 
-from langchain.chat_models import init_chat_model
 from langchain_core.prompts import PromptTemplate
 from pydantic import BaseModel, Field
 
+from app.agent.config import model
 from app.agent.state import AgentState
-
-model = init_chat_model("openai:gpt-4o")
 
 
 class Grade(BaseModel):

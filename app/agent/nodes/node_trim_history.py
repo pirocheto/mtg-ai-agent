@@ -1,9 +1,6 @@
-from langchain.chat_models import init_chat_model
 from langchain_core.messages import RemoveMessage, trim_messages
 
 from app.agent.state import AgentState
-
-model = init_chat_model("openai:gpt-4o")
 
 
 def trim_history(state: AgentState):
