@@ -1,19 +1,21 @@
 services:
   app:
-    image: "${APP_NAME}:${TAG_VERSION}"
-    container_name: "${APP_NAME}"
+    image: "${APP_NAME:-app}:${APP_VERSION:-latest}"
+    container_name: "${APP_NAME:-app}"
     restart: always
     environment:
       OPENAI_API_KEY: "${OPENAI_API_KEY}"
       CHAINLIT_AUTH_SECRET: "${CHAINLIT_AUTH_SECRET}"
+      OAUTH_GITHUB_CLIENT_ID: "${OAUTH_GITHUB_CLIENT_ID}"
+      OAUTH_GITHUB_CLIENT_SECRET: "${OAUTH_GITHUB_CLIENT_SECRET}"
     networks:
       - traefik_net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.${APP_NAME}.rule=Host(`chat.magicoracle.net`)"
-      - "traefik.http.routers.${APP_NAME}.entrypoints=websecure"
-      - "traefik.http.routers.${APP_NAME}.tls.certresolver=letsencrypt"
-      - "traefik.http.services.${APP_NAME}.loadbalancer.server.port=80"
+      - "traefik.http.routers.${APP_NAME:-app}.rule=Host(`chat.magicoracle.net`)"
+      - "traefik.http.routers.${APP_NAME:-app}.entrypoints=websecure"
+      - "traefik.http.routers.${APP_NAME:-app}.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${APP_NAME:-app}.loadbalancer.server.port=80"
 
   reverse-proxy:
     image: "traefik:v2.9"

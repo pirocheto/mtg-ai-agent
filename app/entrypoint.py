@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import cast
+from typing import Optional, cast
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
@@ -9,6 +9,7 @@ from langchain_core.messages import BaseMessage, HumanMessage
 # Add the parent directory to the sys.path so that the app module
 # can be imported with `chainlit run` command
 sys.path.append(Path(__file__).parents[1].as_posix())
+
 
 from app.agent.graph import graph
 
@@ -52,16 +53,24 @@ async def set_starters():
     ]
 
 
-@cl.password_auth_callback
-def auth_callback(username: str, password: str):
-    # Fetch the user matching username from your database
-    # and compare the hashed password with the value stored in the database
-    if (username, password) == ("admin", "admin"):
-        return cl.User(
-            identifier="admin", metadata={"role": "admin", "provider": "credentials"}
-        )
-    else:
-        return None
+# @cl.password_auth_callback
+# def auth_callback(username: str, password: str):
+#     # Fetch the user matching username from your database
+#     # and compare the hashed password with the value stored in the database
+#     if (username, password) == ("admin", "admin"):
+#         return cl.User(
+#             identifier="admin", metadata={"role": "admin", "provider": "credentials"}
+#         )
+#     else:
+#         return None
+
+
+@cl.oauth_callback
+def oauth_callback(
+    provider_id: str, token: str, raw_user_data: dict[str, str], default_user: cl.User
+) -> Optional[cl.User]:
+    print("provider_id", provider_id)
+    return default_user
 
 
 @cl.on_message

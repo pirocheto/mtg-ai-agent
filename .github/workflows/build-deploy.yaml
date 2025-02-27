@@ -46,6 +46,8 @@ jobs:
             email
             openai-api-key
             chainlit-auth-secret
+            oauth-github-client-id
+            oauth-github-client-secret
           access-key: ${{ secrets.SCW_ACCESS_KEY }}
           secret-key: ${{ secrets.SCW_SECRET_KEY }}
           default-project-id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
@@ -69,7 +71,14 @@ jobs:
           username: ${{ secrets.SCW_SSH_USER }}
           key: ${{ secrets.SCW_SSH_KEY }}
           script_stop: true
-          envs: APP_NAME,TAG_VERSION,EMAIL,OPENAI_API_KEY,CHAINLIT_AUTH_SECRET
+          envs: |
+            APP_NAME
+            TAG_VERSION
+            EMAIL
+            OPENAI_API_KEY
+            CHAINLIT_AUTH_SECRET
+            OAUTH_GITHUB_CLIENT_ID
+            OAUTH_GITHUB_CLIENT_SECRET
           script: |
             cd /home/${{ secrets.SCW_SSH_USER }}
             docker load -i ${{ env.APP_NAME }}.tar
