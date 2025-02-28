@@ -12,7 +12,9 @@ from langchain_core.messages import BaseMessage, HumanMessage
 sys.path.append(Path(__file__).parents[1].as_posix())
 
 
-from app.agent.graph import graph
+from app.agent.graph import create_graph
+
+graph = create_graph()
 
 
 @cl.on_chat_start

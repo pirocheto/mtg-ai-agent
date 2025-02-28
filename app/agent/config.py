@@ -1,7 +1,10 @@
 from functools import lru_cache
+from pathlib import Path
 
+from langchain_community.vectorstores import FAISS
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 system_prompt = """
 You are an assistant that helps users with questions about Magic: The Gathering rules and cards.
@@ -15,26 +18,22 @@ Image should be format as ![image](url).
 
 @lru_cache
 def get_model() -> BaseChatModel:
-    # Mistral Nemo from Scaleway
-    # return ChatOpenAI(
-    #     model="mistral-nemo-instruct-2407",
-    #     base_url="https://api.scaleway.ai/v1",
-    #     api_key=os.environ["SCW_SECRET_KEY"],  # type: ignore
-    # )
-
-    # Deepseek R1 from Scaleway
-    # return ChatOpenAI(
-    #     model="deepseek-r1-distill-llama-70b",
-    #     base_url="https://api.scaleway.ai/v1",
-    #     api_key=os.environ["SCW_SECRET_KEY"],  # type: ignore
-    # )
-
-    # Llama 3.3 from Scaleway
-    # return ChatOpenAI(
-    #     model="llama-3.3-70b-instruct",
-    #     base_url="https://api.scaleway.ai/v1",
-    #     api_key=os.environ["SCW_SECRET_KEY"],  # type: ignore
-    # )
-
-    # GPT-4o from OpenAI
+    """Get the chat model for the agent."""
     return ChatOpenAI(model="gpt-4o")
+
+
+@lru_cache
+def get_embedding_model() -> Embeddings:
+    """Get the embedding model for the agent."""
+    return OpenAIEmbeddings(model="text-embedding-3-large")
+
+
+vector_store_path = (
+    Path(__file__).parents[2] / "data/MagicCompRules_2020250207.vectorstore"
+)
+
+vector_store = FAISS.load_local(
+    str(vector_store_path),
+    get_embedding_model(),
+    allow_dangerous_deserialization=True,
+)
