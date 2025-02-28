@@ -1,7 +1,7 @@
 import requests
 from langchain_core.tools import tool
 
-from app.agent.config import vector_store
+from app.agent.config import get_vector_store
 from app.agent.types import MTGCard
 
 
@@ -92,7 +92,7 @@ def mtg_rules_retriever(query: str) -> list[tuple[str, str]]:
         list[tuple[str, str]]: A list of tuples containing the rule number and
         the content of the rule.
     """
-
+    vector_store = get_vector_store()
     retrieved_docs = vector_store.similarity_search(query, k=5)
     retrieved_rules = [
         (doc.metadata["mtg_rule_number"], doc.page_content) for doc in retrieved_docs

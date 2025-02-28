@@ -32,8 +32,12 @@ vector_store_path = (
     Path(__file__).parents[2] / "data/MagicCompRules_2020250207.vectorstore"
 )
 
-vector_store = FAISS.load_local(
-    str(vector_store_path),
-    get_embedding_model(),
-    allow_dangerous_deserialization=True,
-)
+
+@lru_cache
+def get_vector_store() -> FAISS:
+    """Get the vector store for the agent."""
+    return FAISS.load_local(
+        str(vector_store_path),
+        get_embedding_model(),
+        allow_dangerous_deserialization=True,
+    )

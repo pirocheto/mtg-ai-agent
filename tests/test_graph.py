@@ -3,9 +3,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langchain.schema.runnable.config import RunnableConfig
 
-load_dotenv(Path(__file__).parents[1] / "app/.env")
+from app.agent.graph import create_graph
 
-from app.agent.graph import graph
+load_dotenv(Path(__file__).parents[1] / "app/.env")
 
 
 def print_stream(stream):
@@ -18,13 +18,11 @@ def print_stream(stream):
 
 
 def test_graph():
-    question = "Que dis la règle Flying ?"
+    question = "Que dit la règle Flying ?"
     inputs = {"messages": [("user", question)]}
 
-    config = RunnableConfig(
-        configurable={"thread_id": 1},
-    )
-
+    graph = create_graph()
+    config = RunnableConfig(configurable={"thread_id": 1})
     print_stream(graph.stream(inputs, stream_mode="values", config=config))
 
 

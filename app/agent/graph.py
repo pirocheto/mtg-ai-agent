@@ -14,11 +14,7 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from app.agent.config import get_model, system_prompt
 from app.agent.tools import mtg_card_fetcher, mtg_rules_retriever
 
-model = get_model()
-
 tool_list = [mtg_rules_retriever, mtg_card_fetcher]
-
-model_with_tools = model.bind_tools(tool_list)
 
 
 class AgentState(TypedDict):
@@ -85,6 +81,9 @@ def agent(state: AgentState) -> dict:
         dict: The updated state with the agent response appended to messages
     """
 
+    model = get_model()
+    model_with_tools = model.bind_tools(tool_list)
+
     inputs = [SystemMessage(system_prompt)] + state["messages"]  # type: ignore
 
     response = model_with_tools.invoke(inputs)
@@ -95,6 +94,7 @@ def create_graph() -> CompiledStateGraph:
     """
     Create the state graph for the agent.
     """
+
     workflow = StateGraph(AgentState)
 
     tools = ToolNode(tool_list)
